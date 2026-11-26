@@ -1,12 +1,13 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import ScrollToTop from './components/ScrollToTop';
+import ProtectedRoute from './components/ProtectedRoute';
 import { AuthProvider } from './context/AuthContext';
 import { ToastProvider } from './context/ToastContext';
 
-// Pages
+// Protected Pages (Mandatory Authentication)
 import Home from './pages/Home';
 import Workouts from './pages/Workouts';
 import WorkoutPlanner from './pages/WorkoutPlanner';
@@ -20,10 +21,12 @@ import Activity from './pages/Activity';
 import Blog from './pages/Blog';
 import BlogDetails from './pages/BlogDetails';
 import Community from './pages/Community';
+import Profile from './pages/Profile';
+
+// Public Authentication Pages
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import ForgotPassword from './pages/ForgotPassword';
-import Profile from './pages/Profile';
 import NotFound from './pages/NotFound';
 
 export default function App() {
@@ -35,23 +38,126 @@ export default function App() {
             <Navbar />
             <main className="flex-1">
               <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="/workouts" element={<Workouts />} />
-                <Route path="/planner" element={<WorkoutPlanner />} />
-                <Route path="/ai-coach" element={<AICoach />} />
-                <Route path="/workout-generator" element={<WorkoutGenerator />} />
-                <Route path="/nutrition" element={<Nutrition />} />
-                <Route path="/diet-generator" element={<DietGenerator />} />
-                <Route path="/calculators" element={<Calculators />} />
-                <Route path="/progress" element={<Progress />} />
-                <Route path="/activity" element={<Activity />} />
-                <Route path="/blog" element={<Blog />} />
-                <Route path="/blog/:id" element={<BlogDetails />} />
-                <Route path="/community" element={<Community />} />
+                {/* Public Authentication Routes */}
                 <Route path="/login" element={<Login />} />
                 <Route path="/signup" element={<Signup />} />
                 <Route path="/forgot-password" element={<ForgotPassword />} />
-                <Route path="/profile" element={<Profile />} />
+
+                {/* Mandatory Protected Internal Routes */}
+                <Route
+                  path="/"
+                  element={
+                    <ProtectedRoute>
+                      <Home />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/workouts"
+                  element={
+                    <ProtectedRoute>
+                      <Workouts />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/planner"
+                  element={
+                    <ProtectedRoute>
+                      <WorkoutPlanner />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/ai-coach"
+                  element={
+                    <ProtectedRoute>
+                      <AICoach />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/workout-generator"
+                  element={
+                    <ProtectedRoute>
+                      <WorkoutGenerator />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/nutrition"
+                  element={
+                    <ProtectedRoute>
+                      <Nutrition />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/diet-generator"
+                  element={
+                    <ProtectedRoute>
+                      <DietGenerator />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/calculators"
+                  element={
+                    <ProtectedRoute>
+                      <Calculators />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/progress"
+                  element={
+                    <ProtectedRoute>
+                      <Progress />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/activity"
+                  element={
+                    <ProtectedRoute>
+                      <Activity />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/blog"
+                  element={
+                    <ProtectedRoute>
+                      <Blog />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/blog/:id"
+                  element={
+                    <ProtectedRoute>
+                      <BlogDetails />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/community"
+                  element={
+                    <ProtectedRoute>
+                      <Community />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/profile"
+                  element={
+                    <ProtectedRoute>
+                      <Profile />
+                    </ProtectedRoute>
+                  }
+                />
+
+                {/* Fallback 404 Route */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>
@@ -63,4 +169,3 @@ export default function App() {
     </Router>
   );
 }
-

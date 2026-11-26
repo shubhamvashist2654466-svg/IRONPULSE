@@ -14,6 +14,7 @@ export const register = async (req, res, next) => {
       name,
       email,
       password,
+      confirmPassword,
       age,
       gender,
       height,
@@ -23,6 +24,18 @@ export const register = async (req, res, next) => {
       dietaryPreference,
       workoutLocation,
     } = req.body;
+
+    if (!confirmPassword) {
+      return errorResponse(res, 400, 'Confirm password is required.');
+    }
+
+    if (password !== confirmPassword) {
+      return errorResponse(res, 400, 'Passwords do not match. Please try again.');
+    }
+
+    if (password.length < 8) {
+      return errorResponse(res, 400, 'Password must be at least 8 characters long.');
+    }
 
     const userExists = await User.findOne({ email });
     if (userExists) {

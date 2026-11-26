@@ -45,13 +45,23 @@ export default function Navbar() {
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const navigate = useNavigate();
 
+  const handleSignOut = () => {
+    setProfileDropdownOpen(false);
+    setMobileMenuOpen(false);
+    logout();
+    navigate('/login', { replace: true });
+  };
+
   return (
     <>
       <header className="sticky top-0 z-40 w-full bg-dark-950/90 backdrop-blur-md border-b border-dark-600/60">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-20">
             {/* Logo */}
-            <Link to="/" className="flex items-center gap-3 group shrink-0">
+            <Link
+              to={isAuthenticated ? '/' : '/login'}
+              className="flex items-center gap-3 group shrink-0"
+            >
               <div className="w-10 h-10 rounded-xl bg-neon/15 border border-neon/40 flex items-center justify-center group-hover:bg-neon group-hover:shadow-neon transition-all duration-300">
                 <Zap className="w-5 h-5 text-neon group-hover:text-black transition-colors" />
               </div>
@@ -65,125 +75,138 @@ export default function Navbar() {
               </div>
             </Link>
 
-            {/* Desktop Navigation Links */}
-            <nav className="hidden xl:flex items-center gap-1">
-              {NAV_LINKS.map((link) => (
-                <NavLink
-                  key={link.path}
-                  to={link.path}
-                  className={({ isActive }) =>
-                    `px-3 py-2 rounded-lg text-xs font-semibold tracking-wide transition-all duration-200 flex items-center gap-1.5 ${
-                      isActive
-                        ? 'text-neon bg-neon/10 border border-neon/20 shadow-neon-sm'
-                        : link.isSpecial
-                        ? 'text-white bg-dark-800 hover:text-neon hover:border-neon/40 border border-dark-600'
-                        : 'text-zinc-300 hover:text-white hover:bg-dark-800'
-                    }`
-                  }
-                >
-                  <link.icon className="w-3.5 h-3.5" />
-                  <span>{link.name}</span>
-                </NavLink>
-              ))}
-            </nav>
+            {/* Desktop Navigation Links - Shown Only When Authenticated */}
+            {isAuthenticated && (
+              <nav className="hidden xl:flex items-center gap-1">
+                {NAV_LINKS.map((link) => (
+                  <NavLink
+                    key={link.path}
+                    to={link.path}
+                    className={({ isActive }) =>
+                      `px-3 py-2 rounded-lg text-xs font-semibold tracking-wide transition-all duration-200 flex items-center gap-1.5 ${
+                        isActive
+                          ? 'text-neon bg-neon/10 border border-neon/20 shadow-neon-sm'
+                          : link.isSpecial
+                          ? 'text-white bg-dark-800 hover:text-neon hover:border-neon/40 border border-dark-600'
+                          : 'text-zinc-300 hover:text-white hover:bg-dark-800'
+                      }`
+                    }
+                  >
+                    <link.icon className="w-3.5 h-3.5" />
+                    <span>{link.name}</span>
+                  </NavLink>
+                ))}
+              </nav>
+            )}
 
             {/* Right Action Icons & Auth */}
             <div className="flex items-center gap-2 sm:gap-3">
-              {/* Global Search Button */}
-              <button
-                onClick={() => setSearchOpen(true)}
-                className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-dark-800 border border-dark-600 hover:border-dark-500 text-zinc-400 hover:text-white transition-all text-xs"
-                title="Search (Cmd+K)"
-              >
-                <Search className="w-4 h-4 text-neon" />
-                <span className="hidden md:inline">Search...</span>
-                <kbd className="hidden lg:inline text-[10px] bg-dark-700 px-1.5 py-0.5 rounded text-zinc-400">
-                  ⌘K
-                </kbd>
-              </button>
-
-              {/* Notifications Button */}
-              <div className="relative">
-                <button
-                  onClick={() => setNotificationsOpen(!notificationsOpen)}
-                  className="p-2 rounded-xl bg-dark-800 border border-dark-600 hover:border-dark-500 text-zinc-300 hover:text-neon transition-all relative"
-                  title="Notifications"
-                >
-                  <Bell className="w-4 h-4" />
-                  <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-neon animate-pulse" />
-                </button>
-                <NotificationDrawer
-                  isOpen={notificationsOpen}
-                  onClose={() => setNotificationsOpen(false)}
-                />
-              </div>
-
-              {/* User Profile / Auth State */}
               {isAuthenticated ? (
-                <div className="relative">
+                <>
+                  {/* Global Search Button */}
                   <button
-                    onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
-                    className="flex items-center gap-2.5 p-1 sm:px-2 sm:py-1 rounded-xl bg-dark-800 border border-dark-600 hover:border-neon/50 transition-all"
+                    onClick={() => setSearchOpen(true)}
+                    className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-dark-800 border border-dark-600 hover:border-dark-500 text-zinc-400 hover:text-white transition-all text-xs"
+                    title="Search (Cmd+K)"
                   >
-                    <img
-                      src={user?.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80'}
-                      alt={user?.name || 'User'}
-                      className="w-7 h-7 rounded-lg object-cover border border-neon/30"
-                    />
-                    <span className="hidden sm:inline text-xs font-semibold text-white max-w-[90px] truncate">
-                      {user?.name?.split(' ')[0] || 'Athlete'}
-                    </span>
+                    <Search className="w-4 h-4 text-neon" />
+                    <span className="hidden md:inline">Search...</span>
+                    <kbd className="hidden lg:inline text-[10px] bg-dark-700 px-1.5 py-0.5 rounded text-zinc-400">
+                      ⌘K
+                    </kbd>
                   </button>
 
-                  {/* Profile Dropdown */}
-                  <AnimatePresence>
-                    {profileDropdownOpen && (
-                      <motion.div
-                        initial={{ opacity: 0, scale: 0.95, y: 10 }}
-                        animate={{ opacity: 1, scale: 1, y: 0 }}
-                        exit={{ opacity: 0, scale: 0.95, y: 10 }}
-                        className="absolute right-0 top-12 w-52 bg-dark-900 border border-dark-600 rounded-xl shadow-2xl z-50 p-2 overflow-hidden"
-                      >
-                        <div className="px-3 py-2 border-b border-dark-700 mb-1">
-                          <p className="text-xs font-bold text-white truncate">{user?.name}</p>
-                          <p className="text-[11px] text-zinc-400 truncate">{user?.email}</p>
-                          <div className="mt-1 inline-block px-1.5 py-0.5 rounded text-[10px] font-bold bg-neon/15 text-neon border border-neon/30">
-                            {user?.membership || 'PRO ATHLETE'}
+                  {/* Notifications Button */}
+                  <div className="relative">
+                    <button
+                      onClick={() => setNotificationsOpen(!notificationsOpen)}
+                      className="p-2 rounded-xl bg-dark-800 border border-dark-600 hover:border-dark-500 text-zinc-300 hover:text-neon transition-all relative"
+                      title="Notifications"
+                    >
+                      <Bell className="w-4 h-4" />
+                      <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-neon animate-pulse" />
+                    </button>
+                    <NotificationDrawer
+                      isOpen={notificationsOpen}
+                      onClose={() => setNotificationsOpen(false)}
+                    />
+                  </div>
+
+                  {/* User Profile Dropdown */}
+                  <div className="relative">
+                    <button
+                      onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
+                      className="flex items-center gap-2.5 p-1 sm:px-2 sm:py-1 rounded-xl bg-dark-800 border border-dark-600 hover:border-neon/50 transition-all"
+                    >
+                      <img
+                        src={
+                          user?.avatar ||
+                          'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80'
+                        }
+                        alt={user?.name || 'Athlete'}
+                        className="w-7 h-7 rounded-lg object-cover border border-neon/30"
+                      />
+                      <span className="hidden sm:inline text-xs font-semibold text-white max-w-[90px] truncate">
+                        {user?.name?.split(' ')[0] || 'Athlete'}
+                      </span>
+                    </button>
+
+                    {/* Profile Dropdown */}
+                    <AnimatePresence>
+                      {profileDropdownOpen && (
+                        <motion.div
+                          initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                          animate={{ opacity: 1, scale: 1, y: 0 }}
+                          exit={{ opacity: 0, scale: 0.95, y: 10 }}
+                          className="absolute right-0 top-12 w-52 bg-dark-900 border border-dark-600 rounded-xl shadow-2xl z-50 p-2 overflow-hidden"
+                        >
+                          <div className="px-3 py-2 border-b border-dark-700 mb-1">
+                            <p className="text-xs font-bold text-white truncate">{user?.name}</p>
+                            <p className="text-[11px] text-zinc-400 truncate">{user?.email}</p>
+                            <div className="mt-1 inline-block px-1.5 py-0.5 rounded text-[10px] font-bold bg-neon/15 text-neon border border-neon/30">
+                              {user?.membership || 'PRO ATHLETE'}
+                            </div>
                           </div>
-                        </div>
-                        <Link
-                          to="/profile"
-                          onClick={() => setProfileDropdownOpen(false)}
-                          className="flex items-center gap-2 px-3 py-2 text-xs font-medium text-zinc-300 hover:text-white hover:bg-dark-800 rounded-lg transition-colors"
-                        >
-                          <User className="w-3.5 h-3.5 text-neon" />
-                          <span>My Profile</span>
-                        </Link>
-                        <Link
-                          to="/planner"
-                          onClick={() => setProfileDropdownOpen(false)}
-                          className="flex items-center gap-2 px-3 py-2 text-xs font-medium text-zinc-300 hover:text-white hover:bg-dark-800 rounded-lg transition-colors"
-                        >
-                          <Calendar className="w-3.5 h-3.5 text-cyan-400" />
-                          <span>My Workout Plan</span>
-                        </Link>
-                        <button
-                          onClick={() => {
-                            setProfileDropdownOpen(false);
-                            logout();
-                            navigate('/login');
-                          }}
-                          className="w-full flex items-center gap-2 px-3 py-2 text-xs font-medium text-red-400 hover:bg-red-500/10 rounded-lg transition-colors mt-1 border-t border-dark-700/50"
-                        >
-                          <LogOut className="w-3.5 h-3.5" />
-                          <span>Sign Out</span>
-                        </button>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
+                          <Link
+                            to="/profile"
+                            onClick={() => setProfileDropdownOpen(false)}
+                            className="flex items-center gap-2 px-3 py-2 text-xs font-medium text-zinc-300 hover:text-white hover:bg-dark-800 rounded-lg transition-colors"
+                          >
+                            <User className="w-3.5 h-3.5 text-neon" />
+                            <span>My Profile</span>
+                          </Link>
+                          <Link
+                            to="/planner"
+                            onClick={() => setProfileDropdownOpen(false)}
+                            className="flex items-center gap-2 px-3 py-2 text-xs font-medium text-zinc-300 hover:text-white hover:bg-dark-800 rounded-lg transition-colors"
+                          >
+                            <Calendar className="w-3.5 h-3.5 text-cyan-400" />
+                            <span>My Workout Plan</span>
+                          </Link>
+                          <button
+                            onClick={handleSignOut}
+                            className="w-full flex items-center gap-2 px-3 py-2 text-xs font-medium text-red-400 hover:bg-red-500/10 rounded-lg transition-colors mt-1 border-t border-dark-700/50"
+                          >
+                            <LogOut className="w-3.5 h-3.5" />
+                            <span>Sign Out</span>
+                          </button>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+
+                  {/* Mobile Menu Hamburger (for authenticated internal pages) */}
+                  <button
+                    onClick={() => setMobileMenuOpen(true)}
+                    className="xl:hidden p-2 rounded-xl bg-dark-800 border border-dark-600 text-zinc-300 hover:text-white"
+                    aria-label="Open mobile menu"
+                  >
+                    <Menu className="w-5 h-5" />
+                  </button>
+                </>
               ) : (
-                <div className="flex items-center gap-2">
+                /* Unauthenticated State: Show Log In & Sign Up */
+                <div className="flex items-center gap-2 sm:gap-3">
                   <Link
                     to="/login"
                     className="text-xs font-semibold text-zinc-300 hover:text-white px-3 py-2 transition-colors"
@@ -192,32 +215,25 @@ export default function Navbar() {
                   </Link>
                   <Link
                     to="/signup"
-                    className="text-xs font-bold bg-neon text-black px-3.5 py-2 rounded-xl hover:bg-neon-hover shadow-neon-sm transition-all"
+                    className="text-xs font-bold bg-neon text-black px-4 py-2 rounded-xl hover:bg-neon-hover shadow-neon-sm transition-all"
                   >
-                    Sign Up
+                    Sign Up Free
                   </Link>
                 </div>
               )}
-
-              {/* Mobile Menu Button */}
-              <button
-                onClick={() => setMobileMenuOpen(true)}
-                className="xl:hidden p-2 rounded-xl bg-dark-800 border border-dark-600 text-zinc-300 hover:text-white"
-                aria-label="Open mobile menu"
-              >
-                <Menu className="w-5 h-5" />
-              </button>
             </div>
           </div>
         </div>
       </header>
 
       {/* Global Search Modal */}
-      <GlobalSearch isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
+      {isAuthenticated && (
+        <GlobalSearch isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
+      )}
 
-      {/* Mobile Drawer Navigation */}
+      {/* Mobile Drawer Navigation (Authenticated) */}
       <AnimatePresence>
-        {mobileMenuOpen && (
+        {mobileMenuOpen && isAuthenticated && (
           <div className="fixed inset-0 z-50 xl:hidden">
             <motion.div
               initial={{ opacity: 0 }}
@@ -240,7 +256,9 @@ export default function Navbar() {
                     <div className="w-8 h-8 rounded-lg bg-neon/20 flex items-center justify-center border border-neon/30">
                       <Zap className="w-4 h-4 text-neon" />
                     </div>
-                    <span className="font-extrabold text-white text-lg font-display">IRONPULSE</span>
+                    <span className="font-extrabold text-white text-lg font-display">
+                      IRONPULSE
+                    </span>
                   </div>
                   <button
                     onClick={() => setMobileMenuOpen(false)}
@@ -277,53 +295,33 @@ export default function Navbar() {
 
               {/* Mobile Drawer Bottom */}
               <div className="pt-6 border-t border-dark-700 space-y-3">
-                {isAuthenticated ? (
-                  <div className="space-y-2">
-                    <Link
-                      to="/profile"
-                      onClick={() => setMobileMenuOpen(false)}
-                      className="flex items-center gap-3 p-2.5 rounded-xl bg-dark-800 border border-dark-600"
-                    >
-                      <img
-                        src={user?.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80'}
-                        alt={user?.name}
-                        className="w-9 h-9 rounded-lg object-cover"
-                      />
-                      <div className="flex-1 min-w-0">
-                        <p className="text-xs font-bold text-white truncate">{user?.name}</p>
-                        <p className="text-[10px] text-zinc-400 truncate">{user?.email}</p>
-                      </div>
-                    </Link>
-                    <button
-                      onClick={() => {
-                        setMobileMenuOpen(false);
-                        logout();
-                        navigate('/login');
-                      }}
-                      className="w-full flex items-center justify-center gap-2 py-2 text-xs font-semibold text-red-400 bg-red-500/10 rounded-xl hover:bg-red-500/20"
-                    >
-                      <LogOut className="w-3.5 h-3.5" />
-                      Sign Out
-                    </button>
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-2 gap-2">
-                    <Link
-                      to="/login"
-                      onClick={() => setMobileMenuOpen(false)}
-                      className="py-2.5 text-center text-xs font-semibold text-white bg-dark-800 border border-dark-600 rounded-xl hover:bg-dark-700"
-                    >
-                      Log In
-                    </Link>
-                    <Link
-                      to="/signup"
-                      onClick={() => setMobileMenuOpen(false)}
-                      className="py-2.5 text-center text-xs font-bold text-black bg-neon rounded-xl hover:bg-neon-hover shadow-neon-sm"
-                    >
-                      Sign Up
-                    </Link>
-                  </div>
-                )}
+                <div className="space-y-2">
+                  <Link
+                    to="/profile"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center gap-3 p-2.5 rounded-xl bg-dark-800 border border-dark-600"
+                  >
+                    <img
+                      src={
+                        user?.avatar ||
+                        'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80'
+                      }
+                      alt={user?.name}
+                      className="w-9 h-9 rounded-lg object-cover"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-bold text-white truncate">{user?.name}</p>
+                      <p className="text-[10px] text-zinc-400 truncate">{user?.email}</p>
+                    </div>
+                  </Link>
+                  <button
+                    onClick={handleSignOut}
+                    className="w-full flex items-center justify-center gap-2 py-2 text-xs font-semibold text-red-400 bg-red-500/10 rounded-xl hover:bg-red-500/20"
+                  >
+                    <LogOut className="w-3.5 h-3.5" />
+                    Sign Out
+                  </button>
+                </div>
                 <p className="text-[11px] text-zinc-500 text-center font-mono">
                   IRONPULSE v1.0 • Strength Meets Science
                 </p>
@@ -335,4 +333,3 @@ export default function Navbar() {
     </>
   );
 }
-
