@@ -4,7 +4,7 @@ services:
   # ----------------------------------------------------
   - type: web
     name: ironpulse-backend
-    runtime: node
+    env: node
     rootDir: backend
     plan: free
     region: oregon
@@ -26,8 +26,9 @@ services:
   # ----------------------------------------------------
   # 2. IRONPULSE Frontend Static Site (React.js + Vite)
   # ----------------------------------------------------
-  - type: static
+  - type: web
     name: ironpulse-frontend
+    env: static
     plan: free
     buildCommand: npm install && npm run build
     staticPublishPath: ./dist
