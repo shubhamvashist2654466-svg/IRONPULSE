@@ -14,7 +14,7 @@ services:
     envVars:
       - key: NODE_ENV
         value: production
-      - key: MONGODB_URI
+      - key: MONGODB_URI=mongodb+srv://2505401011_db_user:mongodb2654466@ironpulse.ki4gx12.mongodb.net/ironpulse?compressors=zlib
         sync: false
       - key: JWT_SECRET
         generateValue: true
