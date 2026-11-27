@@ -4,6 +4,9 @@ import { errorResponse } from '../utils/apiResponse.js';
  * 404 Not Found Handler for unmatched routes
  */
 export const notFound = (req, res, next) => {
+  if (req.originalUrl === '/favicon.ico') {
+    return res.status(204).end();
+  }
   const error = new Error(`Resource not found - ${req.originalUrl}`);
   res.status(404);
   next(error);
@@ -57,7 +60,7 @@ export const errorHandler = (err, req, res, next) => {
     message = 'File size limit exceeded. Maximum file size allowed is 5MB.';
   }
 
-  if (process.env.NODE_ENV === 'development') {
+  if (process.env.NODE_ENV === 'development' && statusCode >= 500) {
     console.error('💥 Error Stack:', err.stack);
   }
 

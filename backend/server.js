@@ -105,6 +105,9 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 // Static uploads directory
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
+// Favicon handler to prevent 404 errors in browser requests
+app.get('/favicon.ico', (req, res) => res.status(204).end());
+
 // Health Check Endpoint
 app.get('/api/health', (req, res) => {
   const dbState = mongoose.connection.readyState;
