@@ -14,8 +14,8 @@ services:
     envVars:
       - key: NODE_ENV
         value: production
-      - key: MONGODB_URI=mongodb+srv://2505401011_db_user:mongodb2654466@ironpulse.ki4gx12.mongodb.net/ironpulse?compressors=zlib
-        sync: false
+      - key: MONGODB_URI
+        value: mongodb+srv://2505401011_db_user:mongodb2654466@ironpulse.ki4gx12.mongodb.net/ironpulse?compressors=zlib
       - key: JWT_SECRET
         generateValue: true
       - key: JWT_EXPIRES_IN
@@ -26,11 +26,9 @@ services:
   # ----------------------------------------------------
   # 2. IRONPULSE Frontend Static Site (React.js + Vite)
   # ----------------------------------------------------
-  - type: web
+  - type: static
     name: ironpulse-frontend
-    runtime: static
     plan: free
-    region: oregon
     buildCommand: npm install && npm run build
     staticPublishPath: ./dist
     routes:
