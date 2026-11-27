@@ -69,7 +69,7 @@ export const changePasswordValidator = [
 
   body('newPassword')
     .notEmpty().withMessage('New password is required')
-    .isLength({ min: 6 }).withMessage('New password must be at least 6 characters long'),
+    .isLength({ min: 8 }).withMessage('New password must be at least 8 characters long'),
 ];
 
 export const forgotPasswordValidator = [
@@ -85,5 +85,5 @@ export const resetPasswordValidator = [
 
   body('password')
     .notEmpty().withMessage('New password is required')
-    .isLength({ min: 6 }).withMessage('New password must be at least 6 characters long'),
+    .isLength({ min: 8 }).withMessage('New password must be at least 8 characters long'),
 ];

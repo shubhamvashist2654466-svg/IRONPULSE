@@ -7,6 +7,7 @@ import morgan from 'morgan';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
+import mongoose from 'mongoose';
 import { connectDB } from './config/db.js';
 import { notFound, errorHandler } from './middleware/errorMiddleware.js';
 
@@ -25,11 +26,12 @@ import uploadRoutes from './routes/uploadRoutes.js';
 import calculatorRoutes from './routes/calculatorRoutes.js';
 import notificationRoutes from './routes/notificationRoutes.js';
 
-// Load environment variables from backend/.env
-dotenv.config();
-
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+// Load environment variables reliably from backend/.env regardless of execution directory
+dotenv.config({ path: path.join(__dirname, '.env') });
+dotenv.config(); // fallback to current working directory if present
 
 const app = express();
 
@@ -105,12 +107,21 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Health Check Endpoint
 app.get('/api/health', (req, res) => {
+  const dbState = mongoose.connection.readyState;
+  const dbStatusMap = {
+    0: 'disconnected',
+    1: 'connected',
+    2: 'connecting',
+    3: 'disconnecting',
+  };
+
   res.status(200).json({
     status: 'healthy',
     platform: 'IRONPULSE REST API',
     uptime: process.uptime(),
     timestamp: new Date().toISOString(),
     environment: process.env.NODE_ENV || 'development',
+    database: dbStatusMap[dbState] || 'unknown',
   });
 });
 
@@ -165,6 +176,14 @@ const startServer = async () => {
 ║  💚 Health Check http://localhost:${PORT}/api/health         ║
 ╚════════════════════════════════════════════════════════════╝
     `);
+  });
+
+  server.on('error', (err) => {
+    if (err.code === 'EADDRINUSE') {
+      console.warn(`⚠️  Port ${PORT} is already in use by an active process.`);
+    } else {
+      console.error(`❌ Server startup error: ${err.message}`);
+    }
   });
 
   // Handle unhandled promise rejections

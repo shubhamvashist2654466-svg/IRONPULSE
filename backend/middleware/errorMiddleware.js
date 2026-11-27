@@ -17,8 +17,8 @@ export const errorHandler = (err, req, res, next) => {
   let message = err.message || 'Internal Server Error';
   let errors = null;
 
-  // Mongoose Bad ObjectId (CastError)
-  if (err.name === 'CastError' && err.kind === 'ObjectId') {
+  // Mongoose Bad ObjectId or CastError
+  if (err.name === 'CastError') {
     statusCode = 404;
     message = `Resource not found with ID of '${err.value}'`;
   }
@@ -26,7 +26,7 @@ export const errorHandler = (err, req, res, next) => {
   // Mongoose Duplicate Key Error (Code 11000)
   if (err.code === 11000) {
     statusCode = 409;
-    const field = Object.keys(err.keyValue)[0];
+    const field = err.keyValue ? Object.keys(err.keyValue)[0] : 'field';
     message = `Duplicate value entered for field '${field}'. An account or resource already exists with this ${field}.`;
   }
 

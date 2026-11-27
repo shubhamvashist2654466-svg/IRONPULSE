@@ -21,22 +21,27 @@ export const logDailyActivity = async (req, res, next) => {
       restingHeartRate,
     } = req.body;
 
+    const updateFields = {};
+    if (steps !== undefined) updateFields.steps = Number(steps);
+    if (stepTarget !== undefined) updateFields.stepTarget = Number(stepTarget);
+    if (activeCalories !== undefined) updateFields.activeCalories = Number(activeCalories);
+    if (distanceKm !== undefined) updateFields.distanceKm = Number(distanceKm);
+    if (activeMinutes !== undefined) updateFields.activeMinutes = Number(activeMinutes);
+    if (workoutDurationMinutes !== undefined) updateFields.workoutDurationMinutes = Number(workoutDurationMinutes);
+    if (sleepHours !== undefined) updateFields.sleepHours = Number(sleepHours);
+    if (sleepStages !== undefined) updateFields.sleepStages = sleepStages;
+    if (restingHeartRate !== undefined) updateFields.restingHeartRate = Number(restingHeartRate);
+
     const activity = await Activity.findOneAndUpdate(
       { user: req.user.id, date },
       {
-        user: req.user.id,
-        date,
-        steps: steps || 0,
-        stepTarget: stepTarget || 10000,
-        activeCalories: activeCalories || 0,
-        distanceKm: distanceKm || 0,
-        activeMinutes: activeMinutes || 0,
-        workoutDurationMinutes: workoutDurationMinutes || 0,
-        sleepHours: sleepHours || 0,
-        sleepStages: sleepStages || { deepMinutes: 0, remMinutes: 0, lightMinutes: 0 },
-        restingHeartRate: restingHeartRate || 60,
+        $set: updateFields,
+        $setOnInsert: {
+          user: req.user.id,
+          date,
+        },
       },
-      { new: true, upsert: true, runValidators: true }
+      { new: true, upsert: true, runValidators: true, setDefaultsOnInsert: true }
     );
 
     return successResponse(res, 200, 'Activity record saved successfully', { activity });

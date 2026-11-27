@@ -157,7 +157,11 @@ export const updateExercise = async (req, res, next) => {
       return errorResponse(res, 404, 'Exercise not found');
     }
 
-    if (exercise.createdBy && exercise.createdBy.toString() !== req.user.id && req.user.role !== 'admin') {
+    if (!exercise.createdBy) {
+      if (req.user.role !== 'admin') {
+        return errorResponse(res, 403, 'Only administrators can modify default library exercises');
+      }
+    } else if (exercise.createdBy.toString() !== req.user.id && req.user.role !== 'admin') {
       return errorResponse(res, 403, 'Unauthorized to update this exercise');
     }
 
@@ -184,7 +188,11 @@ export const deleteExercise = async (req, res, next) => {
       return errorResponse(res, 404, 'Exercise not found');
     }
 
-    if (exercise.createdBy && exercise.createdBy.toString() !== req.user.id && req.user.role !== 'admin') {
+    if (!exercise.createdBy) {
+      if (req.user.role !== 'admin') {
+        return errorResponse(res, 403, 'Only administrators can delete default library exercises');
+      }
+    } else if (exercise.createdBy.toString() !== req.user.id && req.user.role !== 'admin') {
       return errorResponse(res, 403, 'Unauthorized to delete this exercise');
     }
 

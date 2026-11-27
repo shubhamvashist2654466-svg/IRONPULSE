@@ -37,14 +37,15 @@ export const register = async (req, res, next) => {
       return errorResponse(res, 400, 'Password must be at least 8 characters long.');
     }
 
-    const userExists = await User.findOne({ email });
+    const normalizedEmail = email ? email.trim().toLowerCase() : '';
+    const userExists = await User.findOne({ email: normalizedEmail });
     if (userExists) {
       return errorResponse(res, 400, 'An athlete account with this email address already exists.');
     }
 
     const user = await User.create({
       name,
-      email,
+      email: normalizedEmail,
       password,
       age,
       gender,
@@ -91,8 +92,9 @@ export const register = async (req, res, next) => {
 export const login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
+    const normalizedEmail = email ? email.trim().toLowerCase() : '';
 
-    const user = await User.findOne({ email }).select('+password');
+    const user = await User.findOne({ email: normalizedEmail }).select('+password');
     if (!user) {
       return errorResponse(res, 401, 'Invalid credentials. User not found.');
     }

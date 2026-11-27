@@ -79,6 +79,11 @@ nutritionSchema.pre('save', function (next) {
     this.totalProtein = Math.round(this.foods.reduce((sum, f) => sum + (f.protein || 0), 0) * 10) / 10;
     this.totalCarbs = Math.round(this.foods.reduce((sum, f) => sum + (f.carbs || 0), 0) * 10) / 10;
     this.totalFats = Math.round(this.foods.reduce((sum, f) => sum + (f.fats || 0), 0) * 10) / 10;
+  } else {
+    this.totalCalories = 0;
+    this.totalProtein = 0;
+    this.totalCarbs = 0;
+    this.totalFats = 0;
   }
   next();
 });

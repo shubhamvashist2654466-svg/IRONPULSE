@@ -96,17 +96,38 @@ export const toggleFavoriteExercise = async (req, res, next) => {
     const { exerciseId } = req.params;
     const user = await User.findById(req.user.id);
 
-    const isFav = user.favoriteExercises.some((id) => id.toString() === exerciseId);
+    if (!user) {
+      return errorResponse(res, 404, 'User profile not found');
+    }
+
+    // Support both MongoDB ObjectId and exercise slug
+    let exercise;
+    if (exerciseId.match(/^[0-9a-fA-F]{24}$/)) {
+      exercise = await Exercise.findById(exerciseId);
+    } else {
+      exercise = await Exercise.findOne({ slug: exerciseId.toLowerCase() });
+    }
+
+    if (!exercise) {
+      return errorResponse(res, 404, 'Exercise not found in library');
+    }
+
+    if (!user.favoriteExercises) {
+      user.favoriteExercises = [];
+    }
+
+    const targetId = exercise._id.toString();
+    const isFav = user.favoriteExercises.some((id) => id.toString() === targetId);
 
     if (isFav) {
-      user.favoriteExercises = user.favoriteExercises.filter((id) => id.toString() !== exerciseId);
+      user.favoriteExercises = user.favoriteExercises.filter((id) => id.toString() !== targetId);
       await user.save();
       return successResponse(res, 200, 'Exercise removed from favorites', {
         isFavorite: false,
         favoriteCount: user.favoriteExercises.length,
       });
     } else {
-      user.favoriteExercises.push(exerciseId);
+      user.favoriteExercises.push(exercise._id);
       await user.save();
       return successResponse(res, 200, 'Exercise added to favorites', {
         isFavorite: true,
@@ -126,8 +147,11 @@ export const toggleFavoriteExercise = async (req, res, next) => {
 export const getFavorites = async (req, res, next) => {
   try {
     const user = await User.findById(req.user.id).populate('favoriteExercises');
+    if (!user) {
+      return errorResponse(res, 404, 'User profile not found');
+    }
     return successResponse(res, 200, 'Favorite exercises retrieved', {
-      favorites: user.favoriteExercises,
+      favorites: user.favoriteExercises || [],
     });
   } catch (error) {
     next(error);

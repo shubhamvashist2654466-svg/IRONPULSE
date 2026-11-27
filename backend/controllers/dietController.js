@@ -87,7 +87,11 @@ export const updateDietPlan = async (req, res, next) => {
       return errorResponse(res, 404, 'Diet plan not found');
     }
 
-    if (plan.user && plan.user.toString() !== req.user.id && req.user.role !== 'admin') {
+    if (!plan.user) {
+      if (req.user.role !== 'admin') {
+        return errorResponse(res, 403, 'Only administrators can modify curated template diet plans');
+      }
+    } else if (plan.user.toString() !== req.user.id && req.user.role !== 'admin') {
       return errorResponse(res, 403, 'Unauthorized to edit this diet plan');
     }
 
@@ -114,7 +118,11 @@ export const deleteDietPlan = async (req, res, next) => {
       return errorResponse(res, 404, 'Diet plan not found');
     }
 
-    if (plan.user && plan.user.toString() !== req.user.id && req.user.role !== 'admin') {
+    if (!plan.user) {
+      if (req.user.role !== 'admin') {
+        return errorResponse(res, 403, 'Only administrators can delete curated template diet plans');
+      }
+    } else if (plan.user.toString() !== req.user.id && req.user.role !== 'admin') {
       return errorResponse(res, 403, 'Unauthorized');
     }
 

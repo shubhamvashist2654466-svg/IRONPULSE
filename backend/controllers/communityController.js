@@ -194,7 +194,7 @@ export const deleteComment = async (req, res, next) => {
       return errorResponse(res, 403, 'Unauthorized to delete this comment');
     }
 
-    comment.deleteOne();
+    post.comments.pull(comment._id);
     await post.save();
 
     return successResponse(res, 200, 'Comment removed');
