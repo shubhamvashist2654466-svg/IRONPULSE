@@ -39,9 +39,6 @@ export const connectDB = async () => {
     return conn;
   } catch (error) {
     console.error(`❌ MongoDB connection failed: ${error.message}`);
-    console.warn('⚠️  Make sure your IP address is whitelisted in MongoDB Atlas Network Access and credentials are correct.');
-    if (process.env.NODE_ENV === 'production') {
-      process.exit(1);
-    }
+    console.warn('⚠️  Make sure 0.0.0.0/0 (Allow from anywhere) is added in MongoDB Atlas Network Access so Render cloud instances can connect.');
   }
 };
