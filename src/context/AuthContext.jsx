@@ -3,7 +3,8 @@ import { STORAGE_KEYS, DEFAULT_USER } from '../utils/storage';
 
 const AuthContext = createContext(null);
 
-const BACKEND_URL = 'http://localhost:5000/api/v1/auth';
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const BACKEND_URL = `${API_BASE.replace(/\/+$/, '')}/api/v1/auth`;
 const REGISTERED_USERS_KEY = 'ironpulse_registered_athletes';
 
 export function AuthProvider({ children }) {
