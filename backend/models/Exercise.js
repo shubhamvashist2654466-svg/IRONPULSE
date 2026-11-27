@@ -91,11 +91,10 @@ const exerciseSchema = new mongoose.Schema(
 );
 
 // Auto-generate slug
-exerciseSchema.pre('save', function (next) {
+exerciseSchema.pre('save', function () {
   if (this.name && !this.slug) {
     this.slug = this.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
   }
-  next();
 });
 
 const Exercise = mongoose.model('Exercise', exerciseSchema);

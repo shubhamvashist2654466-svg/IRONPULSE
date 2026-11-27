@@ -9,6 +9,8 @@ const __dirname = path.dirname(__filename);
 
 dotenv.config({ path: path.join(__dirname, '..', '.env') });
 dotenv.config();
+
+import User from '../models/User.js';
 import Exercise from '../models/Exercise.js';
 import DietPlan from '../models/DietPlan.js';
 import Blog from '../models/Blog.js';
@@ -483,7 +485,11 @@ const seedDatabase = async () => {
 
     // Seed Blogs
     console.log('🌱 Seeding scientific blog articles...');
-    await Blog.insertMany(SEED_BLOGS);
+    const blogsToSeed = SEED_BLOGS.map((blog) => ({
+      ...blog,
+      slug: blog.slug || blog.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
+    }));
+    await Blog.insertMany(blogsToSeed);
     console.log('📚 Blog articles seeded.');
 
     // Seed Community Posts

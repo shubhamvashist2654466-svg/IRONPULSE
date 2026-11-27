@@ -73,7 +73,7 @@ const nutritionSchema = new mongoose.Schema(
 );
 
 // Pre-save hook to calculate meal macros
-nutritionSchema.pre('save', function (next) {
+nutritionSchema.pre('save', function () {
   if (this.foods && this.foods.length > 0) {
     this.totalCalories = Math.round(this.foods.reduce((sum, f) => sum + (f.calories || 0), 0));
     this.totalProtein = Math.round(this.foods.reduce((sum, f) => sum + (f.protein || 0), 0) * 10) / 10;
@@ -85,7 +85,6 @@ nutritionSchema.pre('save', function (next) {
     this.totalCarbs = 0;
     this.totalFats = 0;
   }
-  next();
 });
 
 nutritionSchema.index({ user: 1, date: 1, mealCategory: 1 });

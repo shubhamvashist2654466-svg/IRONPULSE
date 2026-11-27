@@ -82,12 +82,17 @@ const blogSchema = new mongoose.Schema(
   }
 );
 
-// Slug auto-generation
-blogSchema.pre('save', function (next) {
+// Slug auto-generation before validation and saving
+blogSchema.pre('validate', function () {
   if (this.title && !this.slug) {
     this.slug = this.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
   }
-  next();
+});
+
+blogSchema.pre('save', function () {
+  if (this.title && !this.slug) {
+    this.slug = this.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+  }
 });
 
 const Blog = mongoose.model('Blog', blogSchema);
